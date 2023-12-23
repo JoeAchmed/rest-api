@@ -4,7 +4,7 @@ import apiRouting from "./routes/api.js";
 
 // Create server
 const app = express();
-const port = 3000;
+const port = process.env.APP_PORT;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

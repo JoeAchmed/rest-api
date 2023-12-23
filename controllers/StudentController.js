@@ -1,22 +1,63 @@
 import data from "../data/students.js";
+import Student from "../models/Student.js";
+
+const REQUIRED_DATA = ["nama", "nim", "email", "jurusan"];
 
 class StudentController {
-  index(req, res) {
-    res.json({
-      message: "Menampilkan semua students",
-      data,
-    });
+  async index(req, res) {
+    /**
+     * Memanggil method findAll (Student).
+     * Handle Asynchronous process dengan async await.
+     */
+    try {
+      const students = await Student.findAll();
+      const data = {
+        message: "Menampilkan semua students",
+        data: students,
+      };
+      res.json(data);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
   }
 
-  store(req, res) {
-    const { name } = req.body;
+  async store(req, res) {
+    /**
+     * Memanggil method create.
+     * Mengembalikan data yang baru diinsert.
+     * Kembalikan data dalam bentuk json
+     */
+    try {
+      const { nama, nim, email, jurusan } = req.body;
+      const missingFields = [];
 
-    data.push(name);
+      REQUIRED_DATA.forEach((el) => {
+        if (!req.body[el]) {
+          missingFields.push(el);
+        }
+      });
 
-    res.json({
-      message: `Menambahkan data student: ${name}`,
-      data,
-    });
+      // handle error ketika required field tidak diisi
+      if (!nama || !nim || !email || !jurusan) {
+        throw new Error(`Field ${missingFields.join(",")} harus diisi`);
+      }
+
+      // Menyimpan data ke database
+      const newStudent = await Student.create({
+        nama,
+        nim,
+        email,
+        jurusan,
+      });
+
+      res.json({
+        message: 'Menambahkan data student',
+        data: newStudent,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   }
 
   update(req, res) {
@@ -39,6 +80,15 @@ class StudentController {
     res.json({
       message: `Menghapus student id ${id}`,
       data,
+    });
+  }
+
+  show(req, res) {
+    const { id } = req.params;
+
+    res.json({
+      message: `Menampilkan student id ${id}`,
+      data: data[id],
     });
   }
 }
