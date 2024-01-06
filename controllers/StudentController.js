@@ -52,7 +52,7 @@ class StudentController {
       });
 
       res.json({
-        message: 'Menambahkan data student',
+        message: "Menambahkan data student",
         data: newStudent,
       });
     } catch (error) {
@@ -60,36 +60,90 @@ class StudentController {
     }
   }
 
-  update(req, res) {
-    const { id } = req.params;
-    const { name } = req.body;
+  async update(req, res) {
+    let statusCode = 200;
+    try {
+      const { id } = req.params;
+      // Cari student yang akan dihapus (findByPk)
+      const student = await Student.findByPk(id);
 
-    data[id] = name;
+      if (!student) {
+        statusCode = 404;
+        throw new Error("Student not found !");
+      }
 
-    res.json({
-      message: `Mengedit student id ${id} nama student: ${name}`,
-      data,
-    });
+      const condition = {
+        where: {
+          id,
+        },
+      };
+
+      // Update student berdasarkan id (update).
+      const newData = await Student.update(req.body, condition);
+      if (Boolean(!newData[0])) {
+        statusCode = 400;
+        throw new Error("Failed to update student !");
+      }
+      const data = await Student.findByPk(newData[0]);
+
+      res.status(statusCode).json({
+        message: "Mengedit data student",
+        data,
+      });
+    } catch (error) {
+      res.status(statusCode).json({ message: error.message });
+    }
   }
 
-  destroy(req, res) {
-    const { id } = req.params;
+  async destroy(req, res) {
+    let statusCode = 200;
+    try {
+      const { id } = req.params;
+      // Cari student yang akan dihapus (findByPk)
+      const student = await Student.findByPk(id);
 
-    data.splice(id, 1);
+      if (!student) {
+        statusCode = 404;
+        throw new Error("Student not found !");
+      }
 
-    res.json({
-      message: `Menghapus student id ${id}`,
-      data,
-    });
+      const condition = {
+        where: {
+          id,
+        },
+      };
+
+      // Hapus student berdasarkan id (destroy)
+      await Student.destroy(condition);
+
+      res.status(statusCode).json({
+        message: "Menghapus data student",
+        data,
+      });
+    } catch (error) {
+      res.status(statusCode).json({ message: error.message });
+    }
   }
 
-  show(req, res) {
-    const { id } = req.params;
+  async show(req, res) {
+    let statusCode = 200;
+    try {
+      const { id } = req.params;
+      // Cari student yang akan dihapus (findByPk)
+      const data = await Student.findByPk(id);
 
-    res.json({
-      message: `Menampilkan student id ${id}`,
-      data: data[id],
-    });
+      if (!data) {
+        statusCode = 404;
+        throw new Error("Student not found !");
+      }
+
+      res.status(statusCode).json({
+        message: `Menampilkan data student id: ${id}`,
+        data,
+      });
+    } catch (error) {
+      res.status(statusCode).json({ message: error.message });
+    }
   }
 }
 
