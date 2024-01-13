@@ -1,6 +1,10 @@
 import express from "express";
 // Import controller students
 import StudentController from "../controllers/StudentController.js";
+// Import controller auth
+import AuthController from "../controllers/AuthController.js";
+import auth from "../middleware/auth.js";
+
 
 const router = express.Router();
 
@@ -10,14 +14,20 @@ router.get("/", (req, res) => {
 });
 
 // Routing students
-router.get("/students", StudentController.index);
+// Memasang middleware di level user
+router.get("/students", auth, StudentController.index);
 
-router.post("/students", StudentController.store);
+router.post("/students", auth, StudentController.store);
 
-router.put("/students/:id", StudentController.update);
+router.put("/students/:id", auth, StudentController.update);
 
-router.delete("/students/:id", StudentController.destroy);
+router.delete("/students/:id", auth, StudentController.destroy);
 
-router.get("/students/:id", StudentController.show);
+router.get("/students/:id", auth, StudentController.show);
+
+// Routing auth
+router.post("/register", AuthController.register);
+
+router.post("/login", AuthController.login);
 
 export default router;
