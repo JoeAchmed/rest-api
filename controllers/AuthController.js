@@ -2,8 +2,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-const REQUIRED_DATA = ["username", "nim", "email", "jurusan"];
-
 class AuthController {
   async register(req, res) {
     let statusCode = 201;
